@@ -1,25 +1,23 @@
 #!/bin/bash
 
-#configuramos para mostrar comandos y finalizar si hay error
+#Mostrar los comandos que se van ejecutando 
 set -ex
 
-#importamos el archivo variables
+# Importamos las variables de entorno
 source .env
 
-#Instalamos core
+#Instalamos y actualizamos snap core
 snap install core
 snap refresh core
 
-#Eliminamos el certbot
+#Eliminamos si existiese alguna instalación previa de certbot con apt.
 apt remove certbot -y
 
-#Lo instalamos
+#Instalamos el cliente de Certbot con snapd.
 snap install --classic certbot
 
-#####´
-a2dissite default-ssl.conf
+# Creamos una alias para el comando certbot.
+ln -fs /snap/bin/certbot /usr/bin/certbot
 
-systemctl reload apache2
-
-#L
+#Solicitamos un certificado a Let's Encrypt
 certbot --apache -m $LE_EMAIL --agree-tos --no-eff-email -d $LE_DOMAIN --non-interactive
